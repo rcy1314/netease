@@ -1,6 +1,10 @@
-.idea/
-node_modules/
-.vscode/
+# OS Files
 .DS_Store
-dist
-.vercel
+Thumbs.db
+
+# Dependencies
+node_modules/
+
+# Unconfigured Editors
+.vscode/
+.idea

@@ -1,37 +1,76 @@
-import { PythonShell } from 'python-shell'
-import { readFileSync, createWriteStream } from 'fs'
-import { getInput } from '@actions/core'
-import ejs from 'ejs'
-import fetch from 'node-fetch'
-import logo from './logo.js'
+require('dotenv').config();
+const { Octokit } = require('@octokit/rest');
+const { user_record } = require('NeteaseCloudMusicApi');
 
-const imageToBase64 = (url) =>
-  fetch(url)
-    .then((r) => r.buffer())
-    .then((buf) => `data:image/png;base64,` + buf.toString('base64'))
+const {
+  GIST_ID: gistId,
+  GH_TOKEN: githubToken,
+  USER_ID: userId,
+  USER_TOKEN: userToken,
+} = process.env;
 
-const readTemplateFile = () => readFileSync('./template/svg.ejs', 'utf-8')
+(async () => {
+  /**
+   * First, get user record
+   */
 
-const id = getInput('id') || '105915001'
+  const record = await user_record({
+    cookie: `MUSIC_U=${userToken}`,
+    uid: userId,
+    type: 1, // last week
+  }).catch(error => console.error(`Unable to get user record \n${error}`));
 
-PythonShell.run('163music.py', { args: [id] }, async (err, res) => {
-  if (err) throw err
-  const songs = JSON.parse(res).slice(0, 4)
-  const getAllImages = (recentlyPlayedSongs) =>
-    Promise.all(recentlyPlayedSongs.map(({ song }) => imageToBase64(song.al.picUrl)))
+  /**
+   * Second, get week play data and parse into song/plays diagram
+   */
 
-  const covers = await getAllImages(songs)
+  let totalPlayCount = 0;
+  const { weekData } = record.body;
+  weekData.forEach(data => {
+    totalPlayCount += data.playCount;
+  });
 
-  const templateParams = {
-    recentPlayed: songs.map(({ song }, i) => {
-      return {
-        name: song.name,
-        artist: song.ar.map(({ name }) => name).join('/'),
-        cover: covers[i],
-        logo,
-      }
-    }),
+  const icon = ['🥇', '🥈', '🥉', '', '']
+
+  const lines = weekData.slice(0, 5).reduce((prev, cur, index) => {
+    const playCount = cur.playCount;
+    const artists = cur.song.ar.map(a => a.name);
+    let name = `${cur.song.name} - ${artists.join('/')}`;
+
+    const line = [
+      icon[index].padEnd(2),
+      name,
+      ' · ',
+      `${playCount}`,
+      'plays',
+    ];
+
+    return [...prev, line.join(' ')];
+  }, []);
+
+  /**
+   * Finally, write into gist
+   */
+
+  try {
+    const octokit = new Octokit({
+      auth: `token ${githubToken}`,
+    });
+    const gist = await octokit.gists.get({
+      gist_id: gistId,
+    });
+
+    const filename = Object.keys(gist.data.files)[0];
+    await octokit.gists.update({
+      gist_id: gistId,
+      files: {
+        [filename]: {
+          filename: `🎵 My last week in music`,
+          content: lines.join('\n'),
+        },
+      },
+    });
+  } catch (error) {
+    console.error(`Unable to update gist\n${error}`);
   }
-  const svgFile = createWriteStream('163.svg')
-  svgFile.write(ejs.render(readTemplateFile(), templateParams))
-})
+})();
