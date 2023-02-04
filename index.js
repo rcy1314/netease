@@ -65,7 +65,7 @@ const {
       gist_id: gistId,
       files: {
         [filename]: {
-          filename: `🎵 My last week in music`,
+          filename: `🎵 我最近一周的网易云音乐的听歌记录`,
           content: lines.join('\n'),
         },
       },
