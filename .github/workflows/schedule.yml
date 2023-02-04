@@ -5,6 +5,7 @@ on:
       - main
   schedule:
     - cron: "0 0 * * *"
+ workflow_dispatch:
 
 jobs:
   update-gist:
@@ -17,10 +18,10 @@ jobs:
         env:
           TIMEZONE: Asia/Shanghai
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
-          GIST_ID: 0c3db70aa316f7be2ccefc63f4e5d591
-          USER_ID: 105915001
-          USER_TOKEN: ${{ secrets.USER_TOKEN }}
-       MARKDOWN_FILE: README.md
+          NETEASE_GIST_ID: 0c3db70aa316f7be2ccefc63f4e5d591
+          NETEASE_USER_ID: 105915001
+          NETEASE_USER_TOKEN: ${{ secrets.USER_TOKEN }}
+          MARKDOWN_FILE: README.md
       - name: Commit and push
         run: |-
           git config --global user.email "1129159201@qq.com" && git config --global user.name "rcy1314"
