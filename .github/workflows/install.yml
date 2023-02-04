@@ -6,7 +6,23 @@ on:
 
 jobs:
   build:
+  name: 'netease-recent-actions'
+  description: 'This action allows you to generate an svg profile from your NetEase Cloud Music account'
+  author: 'rcy1314 <1129159201@qq.com>'
+  runs:
+  using: 'node16'
+  main: 'index.js'
+branding:
+  icon: 'edit-3'
+  color: 'blue'
+inputs:
+  id:
+    description: '105915001.'
+    required: true
 
+outputs:
+  deployment-status:
+    description: 'The status of the deployment that indicates if the run failed or passed. Possible outputs include: success|failed|skipped'
     runs-on: ubuntu-latest
 
     steps:
