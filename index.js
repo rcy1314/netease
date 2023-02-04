@@ -7,6 +7,8 @@ const {
   GH_TOKEN: githubToken,
   USER_ID: userId,
   USER_TOKEN: userToken,
+  NETEASE_MUSIC_START_TAG: startTag,
+  NETEASE_MUSIC_END_TAG: endTag,
 } = process.env;
 
 (async () => {
@@ -42,7 +44,7 @@ const {
       name,
       ' · ',
       `${playCount}`,
-      'plays',
+      '次',
     ];
 
     return [...prev, line.join(' ')];
@@ -52,25 +54,56 @@ const {
    * Finally, write into gist
    */
 
-  try {
-    const octokit = new Octokit({
-      auth: `token ${githubToken}`,
-    });
-    const gist = await octokit.gists.get({
-      gist_id: gistId,
-    });
-
-    const filename = Object.keys(gist.data.files)[0];
-    await octokit.gists.update({
-      gist_id: gistId,
-      files: {
-        [filename]: {
-          filename: `🎵 我最近一周的网易云音乐的听歌记录`,
-          content: lines.join('\n'),
-        },
-      },
-    });
-  } catch (error) {
-    console.error(`Unable to update gist\n${error}`);
-  }
-})();
+   const title = `🎵 我最近一周的网易云音乐的听歌记录`;
+   let content = lines.join('\n');
+   if (content === '') {
+     content = 'Oh my God!\n~~~~~~\n我最近一周竟然没有听歌～\n~~~~~~'
+   }
+   try {
+     const octokit = new Octokit({
+       auth: `token ${githubToken}`,
+     });
+     const gist = await octokit.gists.get({
+       gist_id: gistId,
+     });
+ 
+     const filename = Object.keys(gist.data.files)[0];
+     await octokit.gists.update({
+       gist_id: gistId,
+       files: {
+         [filename]: {
+           filename: title,
+           content: content,
+         },
+       },
+     });
+   } catch (error) {
+     console.error(`Unable to update gist\n${error}`);
+   }
+ 
+   // write to markdown
+   const markdownFile = process.env.MARKDOWN_FILE;
+   const start = startTag === undefined ? '<!-- netease-music-box start -->' : startTag;
+   const end = endTag === undefined ? '<!-- netease-music-box end -->' : endTag;
+   const markdownTitle = `\n#### <a href="https://gist.github.com/${gistId}" target="_blank">${title}</a>\n`;
+   const markdownContent = content;
+   if (markdownFile) {
+     fs.readFile(markdownFile, 'utf8', (err, data) => {
+       if (err) {
+         console.error(err);
+         return;
+       }
+       const startIndex = data.indexOf(start) + start.length;
+       const endIndex = data.indexOf(end);
+       const markdown = data.substring(0, startIndex) + markdownTitle + '```text\n' + markdownContent + '\n```\n\n' + data.substring(endIndex);
+       fs.writeFile(markdownFile, markdown, err => {
+         if (err) {
+           console.error(err);
+           return;
+         }
+       });
+     });
+   }
+ 
+ })();
+ 
