@@ -9,7 +9,7 @@ branding:
   color: 'blue'
 inputs:
   id:
-    description: '105915001.'
+    description: '105915001'
     required: true
 
 
