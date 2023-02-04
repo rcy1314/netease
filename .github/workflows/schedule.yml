@@ -21,9 +21,4 @@ jobs:
           NETEASE_USER_ID: 105915001
           NETEASE_USER_TOKEN: ${{ secrets.USER_TOKEN }}
           MARKDOWN_FILE: README.md
-      - name: Commit and push
-        run: |-
-          git config --global user.email "1129159201@qq.com" && git config --global user.name "rcy1314"
-          git diff
-          git add README.md && git commit -m ":robot: Github Action schedule automatically" || exit 0
-          git pull --rebase && git push
+      
