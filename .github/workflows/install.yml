@@ -6,7 +6,9 @@ on:
 
 jobs:
   build:
-
+    name: 'netease-recent-actions'
+    description: 'This action allows you to generate an svg profile from your NetEase Cloud Music account'
+    author: 'rcy1314 1129159201@qq.com'
     runs-on: ubuntu-latest
     using: 'node16'
     main: 'index.js'
