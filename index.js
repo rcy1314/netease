@@ -68,7 +68,7 @@ const {
    * Finally, write into gist
    */
 
-  const title = `🎵 我最近一周的听歌记录`;
+  const title = `🎵 我最近一周的网易云音乐的听歌记录`;
   let content = lines.join('\n');
   if (content === '') {
     content = 'Oh my God!\n~~~~~~\n我最近一周竟然没有听歌～\n~~~~~~'
