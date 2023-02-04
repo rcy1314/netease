@@ -6,15 +6,15 @@ on:
 
 jobs:
   build:
-    name: 'netease-recent-actions'
-    description: 'This action allows you to generate an svg profile from your NetEase Cloud Music account'
-    author: 'rcy1314 1129159201@qq.com'
+    
     runs-on: ubuntu-latest
+    steps:
+     - uses: actions/checkout@main
+     - name: 'netease-recent-actions'
     using: 'node16'
-    main: 'index.js'
-    branding:
-    icon: 'edit-3'
-    color: 'blue'
+     run: npm install
+      - name: index.js
+        run: node index.js
 inputs:
   id:
     description: '105915001'
