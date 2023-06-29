@@ -1,5 +1,9 @@
 name: Update gist
 on:
+
+# Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+  
   push:
     branches:
       - main
@@ -10,7 +14,14 @@ jobs:
   update-gist:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2                                                           
+      - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
       - run: yarn install
       - name: Update gist
         run: |
@@ -28,4 +39,3 @@ jobs:
           GIST_ID: 0c3db70aa316f7be2ccefc63f4e5d591
           USER_ID: 105915001
           USER_TOKEN: ${{ secrets.USER_TOKEN }}
-
