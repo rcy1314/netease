@@ -23,7 +23,8 @@ jobs:
         with:
           node-version: '16'
 
-      - run: yarn install
+      - name: Install dependencies
+        run: yarn install
 
       - name: Update gist
         run: |
