@@ -1,14 +1,14 @@
 name: Update gist
 on:
-
-# Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
   
   push:
     branches:
       - main
   schedule:
     - cron: "0 0 * * *"
+    
+    # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
 
 jobs:
   update-gist:
